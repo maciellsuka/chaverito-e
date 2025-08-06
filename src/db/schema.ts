@@ -1,9 +1,58 @@
-import { integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  boolean,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 export const userTable = pgTable("user", {
-  id: uuid().primaryKey().defaultRandom(),
-  name: text().notNull(),
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified")
+    .$defaultFn(() => false)
+    .notNull(),
+  image: text("image"),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export const sessionTable = pgTable("session", {
+  id: text("id").primaryKey(),
+  expiresAt: timestamp("expires_at").notNull(),
+  token: text("token").notNull().unique(),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  userId: text("user_id")
+    .notNull()
+    .references(() => userTable.id, { onDelete: "cascade" }),
+});
+
+export const accountTable = pgTable("account", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => userTable.id, { onDelete: "cascade" }),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  idToken: text("id_token"),
+  accessTokenExpiresAt: timestamp("access_token_expires_at"),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+  scope: text("scope"),
+  password: text("password"),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
 });
 
 export const categoryTable = pgTable("category", {
@@ -21,7 +70,7 @@ export const productTable = pgTable("product", {
   id: uuid().primaryKey().defaultRandom(), // id of the product
   categoryId: uuid("category_id")
     .notNull()
-    .references(() => categoryTable.id), // categoryId is a foreign key to the category table
+    .references(() => categoryTable.id, { onDelete: "set null" }), // categoryId is a foreign key to the category table
   name: text().notNull(), // name of the product
   slug: text().notNull().unique(), // slug of the product
   description: text().notNull(), // description of the product
@@ -42,7 +91,7 @@ export const productVariantTable = pgTable("product_variant", {
   id: uuid().primaryKey().defaultRandom(),
   productId: uuid("product_id")
     .notNull()
-    .references(() => productTable.id),
+    .references(() => productTable.id, { onDelete: "cascade" }),
   name: text().notNull(),
   slug: text().notNull(),
   color: text().notNull(),
@@ -59,4 +108,4 @@ export const productVariantRelations = relations(
       references: [productTable.id],
     }),
   }),
-);
+); //49:08 aula 2
