@@ -28,6 +28,16 @@ export const productTable = pgTable("product", {
   createdAt: timestamp("created_at").notNull().defaultNow(), // created at timestamp
 });
 
+export const productRelations = relations(productTable, ({ one, many }) => {
+  return {
+    category: one(categoryTable, {
+      fields: [productTable.categoryId],
+      references: [categoryTable.id],
+    }),
+    variants: many(productVariantTable),
+  };
+});
+
 export const productVariantTable = pgTable("product_variant", {
   id: uuid().primaryKey().defaultRandom(),
   productId: uuid("product_id")
@@ -35,15 +45,18 @@ export const productVariantTable = pgTable("product_variant", {
     .references(() => productTable.id),
   name: text().notNull(),
   slug: text().notNull(),
+  color: text().notNull(),
   priceInCents: integer("price_in_cents").notNull(),
+  imageUrl: text("image_url").notNull(), //para mais imagens usar images []
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const productRelations = relations(productTable, ({ one }) => {
-  return {
-    category: one(categoryTable, {
-      fields: [productTable.categoryId],
-      references: [categoryTable.id],
+export const productVariantRelations = relations(
+  productVariantTable,
+  ({ one }) => ({
+    product: one(productTable, {
+      fields: [productVariantTable.productId],
+      references: [productTable.id],
     }),
-  };
-}); //1:47:56
+  }),
+);
