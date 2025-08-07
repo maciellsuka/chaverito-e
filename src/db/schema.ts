@@ -108,4 +108,4 @@ export const productVariantRelations = relations(
       references: [productTable.id],
     }),
   }),
-); //49:08 aula 2
+);
