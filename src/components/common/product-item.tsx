@@ -1,9 +1,9 @@
-import { db } from "@/db";
+import Image from "next/image";
+import Link from "next/link";
+
 import { productTable, productVariantTable } from "@/db/schema";
 import { formatCentsToBRL } from "@/helpers/money";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
-import Link from "next/link";
 
 interface ProductItemProps {
   product: typeof productTable.$inferSelect & {
@@ -15,13 +15,16 @@ interface ProductItemProps {
 const ProductItem = ({ product, textContainerClassName }: ProductItemProps) => {
   const firstVariant = product.variants[0];
   return (
-    <Link href="/" className="flex flex-col gap-4">
+    <Link
+      href={`/product-variant/${firstVariant.slug}`}
+      className="flex flex-col gap-4"
+    >
       <Image
         src={firstVariant.imageUrl}
         alt={firstVariant.name}
         sizes="100vw"
-        width={0}
         height={0}
+        width={0}
         className="h-auto w-full rounded-3xl"
       />
       <div
@@ -42,4 +45,4 @@ const ProductItem = ({ product, textContainerClassName }: ProductItemProps) => {
   );
 };
 
-export default ProductItem; //aww
+export default ProductItem;
