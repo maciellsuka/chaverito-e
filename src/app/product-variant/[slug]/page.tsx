@@ -76,7 +76,7 @@ const ProductPage = async ({ params }: ProductVariantPageProps) => {
         <Footer />
       </div>
     </>
-  );
+  ); //35:35
 };
 
 export default ProductPage;
