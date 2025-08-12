@@ -8,16 +8,24 @@ import { formatCentsToBRL } from "@/helpers/money";
 import { eq } from "drizzle-orm";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import VariantSelector from "./components/variant-selector";
+import QuantitySelector from "./components/quantity-selector";
 
 interface ProductVariantPageProps {
   params: Promise<{ slug: string }>;
 }
 
-const ProductPage = async ({ params }: ProductVariantPageProps) => {
+const ProductVariantPage = async ({ params }: ProductVariantPageProps) => {
   const { slug } = await params;
   const productVariant = await db.query.productVariantTable.findFirst({
     where: eq(productTable.slug, slug),
-    with: { product: true },
+    with: {
+      product: {
+        with: {
+          variants: true,
+        },
+      },
+    },
   });
   if (!productVariant) {
     notFound();
@@ -41,7 +49,12 @@ const ProductPage = async ({ params }: ProductVariantPageProps) => {
           sizes="100vw"
           className="h-auto w-full object-cover"
         />
-        <div className="px-5"> {/* VARIANTES */} </div>
+        <div className="px-5">
+          <VariantSelector
+            selectedVariantSlug={productVariant.slug}
+            variants={productVariant.product.variants}
+          />
+        </div>
         <div className="px-5">
           {/* DESCRICAO */}
           <h2 className="text-lg font-semibold">
@@ -55,7 +68,10 @@ const ProductPage = async ({ params }: ProductVariantPageProps) => {
           </h3>
         </div>
 
-        <div className="px-5"> {/* QUANTIDADE */} </div>
+        <div className="px-5">
+          {" "}
+          <QuantitySelector />{" "}
+        </div>
 
         <div className="flex flex-col space-y-4 px-5">
           {/* BOTOES */}
@@ -79,4 +95,4 @@ const ProductPage = async ({ params }: ProductVariantPageProps) => {
   ); //35:35
 };
 
-export default ProductPage;
+export default ProductVariantPage;
