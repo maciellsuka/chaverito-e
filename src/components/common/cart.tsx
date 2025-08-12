@@ -10,7 +10,7 @@ export const Cart = () => {
           <ShoppingBagIcon />
         </Button>
       </SheetTrigger>
-      <SheetContent>blau auau</SheetContent>
+      <SheetContent></SheetContent>
     </Sheet>
   );
 };
